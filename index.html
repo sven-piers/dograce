@@ -160,6 +160,21 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 .bar i{display:block;height:8px;background:var(--fawn);border-radius:4px}
 .bar span:first-child{flex:0 0 46%}
 footer a{color:var(--soft)}
+/* question d'arrivée */
+.ask{position:fixed;right:clamp(1rem,3vw,2rem);bottom:calc(clamp(1rem,3vw,2rem) + env(safe-area-inset-bottom,0px));z-index:45;width:min(380px,calc(100% - 2rem));background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,.18);padding:1.4rem 1.4rem 1.2rem;transform:translateY(16px);opacity:0;transition:transform .35s cubic-bezier(.2,.7,.1,1),opacity .35s}
+.ask.show{transform:none;opacity:1}
+.ask-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.ask h3{font-size:1.15rem;font-weight:400;letter-spacing:-.01em;line-height:1.3;margin:0}
+.ask .soft{font-size:.88rem;margin:.35rem 0 1rem}
+.ask-x{background:none;border:0;font-size:1.4rem;line-height:1;color:var(--soft);cursor:pointer;padding:0 .2rem;min-width:44px;min-height:44px;margin:-.8rem -.8rem 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem}
+.chips button{font:400 .9rem var(--f);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.55rem .9rem;cursor:pointer;min-height:40px}
+.chips button:hover{border-color:var(--ink)}
+.ask-other{display:flex;gap:.5rem;margin-top:.8rem}
+.ask-other input{flex:1;font:400 .95rem var(--f);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.6rem 1rem}
+.ask-other button{font:500 .9rem var(--f);background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:.6rem 1rem;cursor:pointer}
+.ask-thanks{font-size:.95rem;margin:0}
+@media (prefers-reduced-motion:reduce){.ask{transition:none}}
 /* cart */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--bg);z-index:50;transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.7,.1,1);display:flex;flex-direction:column;padding:calc(2rem + env(safe-area-inset-top,0px)) 2rem calc(2rem + env(safe-area-inset-bottom,0px))}
@@ -342,6 +357,19 @@ body.open .scrim{opacity:1;pointer-events:auto}body.open .drawer{transform:none}
   </div>
 </footer>
 
+<aside class="ask hidden" id="ask" role="dialog" aria-labelledby="askT">
+  <div id="askQ">
+    <div class="ask-top"><h3 id="askT">Comment avez-vous connu DogRace ?</h3><button class="ask-x" id="askClose" type="button" aria-label="Fermer">×</button></div>
+    <p class="soft">Une seule question, un clic. Elle nous aide à mieux vous accompagner.</p>
+    <div class="chips" id="askChips"><button type="button" data-src="Recherche Google">Recherche Google</button><button type="button" data-src="Recommandation de mon vétérinaire">Recommandation de mon vétérinaire</button><button type="button" data-src="Conseil d'un entraîneur ou éleveur">Conseil d'un entraîneur ou éleveur</button><button type="button" data-src="Stand ou affiche dans un cynodrome">Stand ou affiche dans un cynodrome</button><button type="button" data-src="Réponse d'une IA (ChatGPT, Gemini…)">Réponse d'une IA (ChatGPT, Gemini…)</button><button type="button" data-src="Réseaux sociaux">Réseaux sociaux</button><button type="button" data-src="Bouche-à-oreille">Bouche-à-oreille</button><button type="button" data-src="Autre">Autre</button></div>
+    <div class="ask-other hidden" id="askOtherRow"><input id="askOther" placeholder="Précisez" aria-label="Précisez"><button type="button" id="askOtherOk">Valider</button></div>
+  </div>
+  <p class="ask-thanks hidden" id="askThanks">Merci ! Bonne visite.</p>
+</aside>
+<form name="source_visiteur" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="source_visiteur"><input name="bot-field"><input name="source"><input name="source_autre">
+  <input name="utm_source"><input name="utm_medium"><input name="utm_campaign"><input name="referent"><input name="page_entree"><input name="moment">
+</form>
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="ct">
   <header><h3 id="ct">Panier</h3><button class="link" id="closeCart">Fermer</button></header>
@@ -354,19 +382,7 @@ body.open .scrim{opacity:1;pointer-events:auto}body.open .drawer{transform:none}
     <input type="hidden" name="utm_source"><input type="hidden" name="utm_medium"><input type="hidden" name="utm_campaign">
     <input type="hidden" name="referent"><input type="hidden" name="page_entree"><input type="hidden" name="parcours">
     <div class="form-row"><label for="oEmail">Email <span class="req">*</span></label><input id="oEmail" name="email" type="email" required autocomplete="email"></div>
-    <div class="form-row"><label for="oSource">Comment nous avez-vous connus ? <span class="req">*</span></label>
-      <select id="oSource" name="source" required>
-        <option value="">Choisir…</option>
-        <option>Recherche Google</option>
-        <option>Recommandation de mon vétérinaire</option>
-        <option>Conseil d'un entraîneur ou éleveur</option>
-        <option>Stand ou affiche dans un cynodrome</option>
-        <option>Réponse d'une IA (ChatGPT, Gemini…)</option>
-        <option>Réseaux sociaux</option>
-        <option>Bouche-à-oreille</option>
-        <option>Autre</option>
-      </select></div>
-    <div class="form-row hidden" id="oOtherRow"><label for="oOther">Précisez</label><input id="oOther" name="source_autre"></div>
+    <input type="hidden" name="source" id="oSource"><input type="hidden" name="source_autre" id="oOther">
     <div class="form-row"><label for="oCode">Code vétérinaire ou parrain (facultatif)</label><input id="oCode" name="code_prescripteur" placeholder="ex. VETO-MARTIN" autocomplete="off"></div>
     <div class="form-row"><label for="oDogs">Nombre de lévriers nourris</label><select id="oDogs" name="nb_chiens"><option>1</option><option>2</option><option>3 à 5</option><option>6 et plus</option></select></div>
     <button class="btn btn-dark" id="checkout" type="submit">Commander</button>
@@ -479,16 +495,16 @@ function sendForm(form){
 }
 
 const oSource=document.getElementById("oSource");
-oSource.addEventListener("change",()=>document.getElementById("oOtherRow").classList.toggle("hidden",oSource.value!=="Autre"));
 const _open=openCart;
 document.getElementById("openCart").onclick=()=>{track("ouverture_panier");_open()};
-document.addEventListener("click",e=>{if(e.target.closest("[data-add]")){if(!oSource.value)oSource.value=guessSource();const code=sstore.get("dr_code");if(code&&!document.getElementById("oCode").value)document.getElementById("oCode").value=code}});
+document.addEventListener("click",e=>{if(e.target.closest("[data-add]")){const code=sstore.get("dr_code");if(code&&!document.getElementById("oCode").value)document.getElementById("oCode").value=code}});
 
 document.getElementById("orderForm").addEventListener("submit",e=>{
   e.preventDefault();
   const f=e.target,n=Object.values(cart).reduce((s,v)=>s+v,0);
   if(!n)return;
-  const a=attribution();
+  const a=attribution(),ans=store.get("dr_answer",null);
+  f.source.value=ans?ans.source:(guessSource()||"Non renseigné");f.source_autre.value=ans?ans.autre||"":"";
   f.panier.value=Object.keys(cart).filter(k=>cart[k]>0).map(k=>cart[k]+" × "+products.find(p=>p.id===k).name).join(", ");
   f.total.value=n*PRICE;f.kg_commandes.value=n*25;
   ["utm_source","utm_medium","utm_campaign","referent","page_entree"].forEach(k=>f[k].value=a[k]||"");
@@ -498,8 +514,8 @@ document.getElementById("orderForm").addEventListener("submit",e=>{
   orders.push({date:new Date().toISOString(),source:f.source.value==="Autre"?"Autre : "+(f.source_autre.value||"?"):f.source.value,code:f.code_prescripteur.value.trim().toUpperCase(),sacs:n,kg:n*25,total:n*PRICE,utm:a.utm_source||"",med:a.utm_medium||"",camp:a.utm_campaign||""});
   store.set("dr_orders",orders);
   track("commande",{valeur:n*PRICE,source:f.source.value});
-  document.getElementById("msg").innerHTML=`<div class="ok">Commande confirmée : ${n} sac${n>1?"s":""}, ${fmt(n*PRICE)}. Simulation, rien n'a été débité. Merci d'avoir indiqué comment vous nous avez connus.</div>`;
-  cart={};render();f.reset();document.getElementById("oOtherRow").classList.add("hidden");
+  document.getElementById("msg").innerHTML=`<div class="ok">Commande confirmée : ${n} sac${n>1?"s":""}, ${fmt(n*PRICE)}. Simulation, rien n'a été débité.</div>`;
+  cart={};render();f.reset();
 });
 
 function simpleForm(id,msgId,evt,text){
@@ -516,6 +532,38 @@ function simpleForm(id,msgId,evt,text){
 }
 simpleForm("proForm","proMsg","inscription_prescripteur","");
 simpleForm("guideForm","guideMsg","telechargement_guide","Merci ! Le guide arrive dans votre boîte mail.");
+
+/* ---------- QUESTION À L'ARRIVÉE ---------- */
+(()=>{
+  const ask=document.getElementById("ask");
+  if(store.get("dr_answer",null)||store.get("dr_ask_closed",false))return;
+  let shown=false,t0=Date.now();
+  const show=why=>{if(shown)return;shown=true;ask.classList.remove("hidden");requestAnimationFrame(()=>ask.classList.add("show"));track("question_affichee",{declencheur:why});window.removeEventListener("scroll",onScroll)};
+  const onScroll=()=>{const p=scrollY/(document.documentElement.scrollHeight-innerHeight);if(p>.3)show("scroll")};
+  setTimeout(()=>show("temps"),12000);
+  window.addEventListener("scroll",onScroll,{passive:true});
+  const hide=()=>{ask.classList.remove("show");setTimeout(()=>ask.classList.add("hidden"),350)};
+  const save=(src,autre="")=>{
+    const a=attribution();
+    store.set("dr_answer",{source:src,autre,date:new Date().toISOString()});
+    const all=store.get("dr_answers",[]);all.push(src==="Autre"&&autre?"Autre : "+autre:src);store.set("dr_answers",all);
+    track("reponse_source",{source:src});
+    const f=document.forms.source_visiteur;
+    f.source.value=src;f.source_autre.value=autre;["utm_source","utm_medium","utm_campaign","referent","page_entree"].forEach(k=>f[k].value=a[k]||"");
+    f.moment.value=Math.round((Date.now()-t0)/1000)+" s après l'arrivée";
+    sendForm(f);
+    document.getElementById("askQ").classList.add("hidden");document.getElementById("askThanks").classList.remove("hidden");
+    setTimeout(hide,1800);
+  };
+  document.getElementById("askChips").addEventListener("click",e=>{
+    const b=e.target.closest("[data-src]");if(!b)return;
+    if(b.dataset.src==="Autre"){document.getElementById("askOtherRow").classList.remove("hidden");document.getElementById("askOther").focus();return}
+    save(b.dataset.src);
+  });
+  document.getElementById("askOtherOk").onclick=()=>save("Autre",document.getElementById("askOther").value.trim());
+  document.getElementById("askOther").addEventListener("keydown",e=>{if(e.key==="Enter")save("Autre",e.target.value.trim())});
+  document.getElementById("askClose").onclick=()=>{store.set("dr_ask_closed",true);track("question_fermee");hide()};
+})();
 
 /* ---------- TABLEAU DE SUIVI ---------- */
 function showStats(){
@@ -535,8 +583,8 @@ function showStats(){
       <div><b>${kg} kg</b><span>North Star : kilos achetés</span></div>
       <div><b>${conv} %</b><span>taux de conversion</span></div>
     </div>
-    <h3 style="font-size:1.15rem;margin-top:1rem">Comment nous ont-ils connus ?</h3>
-    ${Object.keys(by).length?Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="bar"><span>${k}</span><i style="width:${v/max*40}%"></i><span>${v}</span></div>`).join(""):'<p class="soft">Aucune commande pour l\'instant.</p>'}
+    <h3 style="font-size:1.15rem;margin-top:1rem">Comment nous ont-ils connus ? (tous les visiteurs)</h3>
+    ${sourceTable(o,visits,ev)}
     <h3 style="font-size:1.15rem;margin-top:1.5rem">Trafic par lien (UTM)</h3>
     ${utmTable()}
     <h3 style="font-size:1.15rem;margin-top:1.5rem">Entonnoir</h3>
@@ -559,13 +607,24 @@ function showStats(){
     <button class="link" id="resetStats" style="margin-top:1.5rem;display:block">Réinitialiser les données de démo</button>`;
   document.getElementById("stats").classList.remove("hidden");wireGen();
   document.getElementById("closeStats").onclick=()=>document.getElementById("stats").classList.add("hidden");
-  document.getElementById("resetStats").onclick=()=>{["dr_orders","dr_events","dr_visits","dr_leads","dr_pros","dr_visit_log"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});showStats()};
+  document.getElementById("resetStats").onclick=()=>{["dr_orders","dr_events","dr_visits","dr_leads","dr_pros","dr_visit_log","dr_answers","dr_answer","dr_ask_closed"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});showStats()};
 }
 const UTM_PRESETS=[
   ["Instagram (post / bio)","instagram","social"],["Instagram (story)","instagram","story"],["TikTok","tiktok","social"],
   ["Facebook (groupes lévriers)","facebook","social"],["LinkedIn","linkedin","social"],["Newsletter / email","newsletter","email"],
   ["QR code stand cynodrome","cynodrome","qr_code"],["Flyer chez le vétérinaire","veto","print"],["Publicité Google Ads","google","cpc"],
   ["Publicité Meta (Insta/FB)","meta","paid_social"],["Influenceur / partenaire","influenceur","partenariat"]];
+function sourceTable(o,visits,ev){
+  const ans=store.get("dr_answers",[]),rows={};
+  ans.forEach(s=>{(rows[s]=rows[s]||{r:0,c:0}).r++});
+  o.forEach(x=>{(rows[x.source]=rows[x.source]||{r:0,c:0}).c++});
+  const list=Object.entries(rows).sort((a,b)=>b[1].r-a[1].r);
+  const shown=ev.question_affichee||0,rate=shown?Math.round(ans.length/shown*100):0;
+  const head=`<p class="soft" style="font-size:.9rem;margin:.3rem 0 .6rem">Question posée à ${shown} visiteur${shown>1?"s":""}, ${ans.length} réponse${ans.length>1?"s":""} (${rate} % de réponse).</p>`;
+  if(!list.length)return head+'<p class="soft">Aucune réponse pour l\'instant.</p>';
+  const max=Math.max(1,...list.map(([,r])=>r.r));
+  return head+`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.9rem"><thead><tr style="text-align:left;color:var(--soft)"><th style="padding:.4rem 0">Source</th><th></th><th style="text-align:right">Visiteurs</th><th style="text-align:right">Acheteurs</th><th style="text-align:right">Conv.</th></tr></thead><tbody>${list.map(([k,r])=>`<tr style="border-top:1px solid var(--line)"><td style="padding:.45rem .5rem .45rem 0">${k}</td><td style="width:22%"><i style="display:block;height:8px;border-radius:4px;background:var(--fawn);width:${r.r/max*100}%"></i></td><td style="text-align:right">${r.r}</td><td style="text-align:right">${r.c}</td><td style="text-align:right">${r.r?Math.round(r.c/r.r*100)+" %":"–"}</td></tr>`).join("")}</tbody></table></div>`;
+}
 function utmTable(){
   const vl=store.get("dr_visit_log",[]),o=store.get("dr_orders",[]),rows={};
   const key=(s,m,c)=>[s||"direct",m||"none",c||"—"].join("|");
