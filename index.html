@@ -174,6 +174,7 @@ footer a{color:var(--soft)}
 .ask-other input{flex:1;font:400 .95rem var(--f);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:.6rem 1rem}
 .ask-other button{font:500 .9rem var(--f);background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:.6rem 1rem;cursor:pointer}
 .ask-thanks{font-size:.95rem;margin:0}
+.ask-pill{position:fixed;right:clamp(1rem,3vw,2rem);bottom:calc(clamp(1rem,3vw,2rem) + env(safe-area-inset-bottom,0px));z-index:45;font:500 .9rem var(--f);color:var(--bg);background:var(--ink);border:0;border-radius:999px;padding:.8rem 1.2rem;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 @media (prefers-reduced-motion:reduce){.ask{transition:none}}
 /* cart */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
@@ -366,6 +367,7 @@ body.open .scrim{opacity:1;pointer-events:auto}body.open .drawer{transform:none}
   </div>
   <p class="ask-thanks hidden" id="askThanks">Merci ! Bonne visite.</p>
 </aside>
+<button class="ask-pill hidden" id="askPill" type="button">Comment nous avez-vous connus ?</button>
 <form name="source_visiteur" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
   <input type="hidden" name="form-name" value="source_visiteur"><input name="bot-field"><input name="source"><input name="source_autre">
   <input name="utm_source"><input name="utm_medium"><input name="utm_campaign"><input name="referent"><input name="page_entree"><input name="moment">
@@ -536,7 +538,7 @@ simpleForm("guideForm","guideMsg","telechargement_guide","Merci ! Le guide arriv
 /* ---------- QUESTION À L'ARRIVÉE ---------- */
 (()=>{
   const ask=document.getElementById("ask");
-  if(store.get("dr_answer",null)||store.get("dr_ask_closed",false))return;
+  const pill=document.getElementById("askPill");
   let shown=false,t0=Date.now();
   const show=why=>{if(shown)return;shown=true;ask.classList.remove("hidden");requestAnimationFrame(()=>ask.classList.add("show"));track("question_affichee",{declencheur:why});window.removeEventListener("scroll",onScroll)};
   const onScroll=()=>{const p=scrollY/(document.documentElement.scrollHeight-innerHeight);if(p>.3)show("scroll")};
@@ -562,7 +564,8 @@ simpleForm("guideForm","guideMsg","telechargement_guide","Merci ! Le guide arriv
   });
   document.getElementById("askOtherOk").onclick=()=>save("Autre",document.getElementById("askOther").value.trim());
   document.getElementById("askOther").addEventListener("keydown",e=>{if(e.key==="Enter")save("Autre",e.target.value.trim())});
-  document.getElementById("askClose").onclick=()=>{store.set("dr_ask_closed",true);track("question_fermee");hide()};
+  document.getElementById("askClose").onclick=()=>{track("question_fermee");hide();setTimeout(()=>pill.classList.remove("hidden"),350)};
+  pill.onclick=()=>{pill.classList.add("hidden");ask.classList.remove("hidden");requestAnimationFrame(()=>ask.classList.add("show"))};
 })();
 
 /* ---------- TABLEAU DE SUIVI ---------- */
